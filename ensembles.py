@@ -23,7 +23,7 @@ class RandomForestMSE:
         self.trees = []
         self.tree_features = []
         
-    def fit(self, X, y, X_val=None, y_val=None):
+    def fit(self, X, y, X_val=None, y_val=None, is_fitted=False):
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -37,11 +37,15 @@ class RandomForestMSE:
         y_val : numpy ndarray
             Array of size n_val_objects           
         """
+        if not is_fitted:
+            self.trees = []
+            self.tree_features = []
         val_f = False
         if not(X_val is None or y_val is None): 
             val = 0
             val_f = True
-        for i in range(self.n_estimators):
+            val_score_verbose = []
+        for i in range(1, self.n_estimators+1):
             rows = np.random.randint(0, X.shape[0] , X.shape[0])
             cols = np.random.choice(np.arange(X.shape[1]), int(self.fss * X.shape[1]), replace=False)
             new_X, new_y = X[rows][:, cols], y[rows]
@@ -51,11 +55,14 @@ class RandomForestMSE:
             self.tree_features.append(cols)
             if val_f:
                 val += model.predict(X_val[:, cols])
+                val_score_verbose.append(np.sqrt(((val/i - y_val) ** 2).mean()))
         if val_f:
             val /= self.n_estimators
             score = np.sqrt(((val - y_val) ** 2).mean())
             print("RMSE: %.4f" % score)
-        return self
+            return val_score_verbose
+        else:
+            return self
                       
     def predict(self, X):
         """
@@ -88,7 +95,14 @@ class GradientBoostingMSE:
         feature_subsample_size : float
             The size of feature set for each tree. If None then use recommendations.
         """
-        pass
+        self.learning_rate = learning_rate
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.fss = 1 if feature_subsample_size is None else feature_subsample_size
+        self.kwargs = trees_parameters
+        self.trees = []
+        self.tree_features = []
+        self.loss = self._RMSE
         
     def fit(self, X, y, X_val=None, y_val=None):
         """
@@ -98,7 +112,35 @@ class GradientBoostingMSE:
         y : numpy ndarray
             Array of size n_objects
         """
-        pass
+        w = np.ones(self.n_estimators)
+        f = np.zeros_like(y)
+        g = np.empty(self.n_estimators)
+        val_f = False
+        if not(X_val is None or y_val is None): 
+            val = 0
+            val_f = True
+            val_score_verbose = []
+        for i in range(self.n_estimators):
+            grad = (y - f)
+            #w -= self.learning_rate * g[i]
+            
+            cols = np.random.choice(np.arange(X.shape[1]), int(self.fss * X.shape[1]), replace=False)
+            
+            model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
+            model.fit(X[:, cols], grad)
+            res = model.predict(X[:, cols])
+            g[i] = (grad * res).sum() / (res ** 2).sum() 
+            f += self.learning_rate * g[i] * res
+            self.trees.append(model)
+            self.tree_features.append(cols)
+            if val_f:
+                val += model.predict(X_val[:, cols]) * g[i]
+                val_score_verbose.append(np.sqrt(((val * self.learning_rate - y_val) ** 2).mean()))
+        self.g = g
+        if val_f:
+            return val_score_verbose
+        else:
+            return self
 
     def predict(self, X):
         """
@@ -110,7 +152,10 @@ class GradientBoostingMSE:
         y : numpy ndarray
             Array of size n_objects
         """
-        pass
+        res = 0
+        for i in range(self.n_estimators):
+            res += self.trees[i].predict(X[:, self.tree_features[i]]) * self.g[i]
+        return res * self.learning_rate
 
     def _RMSE(x, y):
         return  np.sqrt(((x - y)**2).mean())

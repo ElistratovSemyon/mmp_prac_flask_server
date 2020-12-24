@@ -4,7 +4,7 @@ from scipy.optimize import minimize_scalar
 
 
 class RandomForestMSE:
-    def __init__(self, n_estimators, max_depth=None, feature_subsample_size=None,
+    def __init__(self, n_estimators=100, max_depth=None, feature_subsample_size=None,
                  **trees_parameters):
         """
         n_estimators : int
@@ -75,13 +75,24 @@ class RandomForestMSE:
             Array of size n_objects
         """
         res = 0
-        for i in range(self.n_estimators):
-            cols = self.tree_features[i]
-            res += self.trees[i].predict(X[:, cols])
+        for i in range(1, self.n_estimators+1):
+            cols = self.tree_features[i-1]
+            res += self.trees[i-1].predict(X[:, cols])
         return res / self.n_estimators
+    
+    def get_params(self):
+        if len(self.trees) == 0:
+            model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
+            tree_params = model.get_params()
+        else:
+            tree_params = self.trees[0].get_params()
+        tree_params = self.trees[0].get_params()
+        tree_params["n_estimators"] = self.n_estimators
+        tree_params.pop("max_features")
+        return tree_params
 
 class GradientBoostingMSE:
-    def __init__(self, n_estimators, learning_rate=0.1, max_depth=5, feature_subsample_size=None,
+    def __init__(self, n_estimators=100, learning_rate=0.1, max_depth=5, feature_subsample_size=None,
                  **trees_parameters):
         """
         n_estimators : int
@@ -122,10 +133,7 @@ class GradientBoostingMSE:
             val_score_verbose = []
         for i in range(self.n_estimators):
             grad = (y - f)
-            #w -= self.learning_rate * g[i]
-            
-            cols = np.random.choice(np.arange(X.shape[1]), int(self.fss * X.shape[1]), replace=False)
-            
+            cols = np.random.choice(np.arange(X.shape[1]), int(self.fss * X.shape[1]), replace=False)            
             model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
             model.fit(X[:, cols], grad)
             res = model.predict(X[:, cols])
@@ -156,6 +164,18 @@ class GradientBoostingMSE:
         for i in range(self.n_estimators):
             res += self.trees[i].predict(X[:, self.tree_features[i]]) * self.g[i]
         return res * self.learning_rate
+
+    def get_params(self):
+        if len(self.trees) == 0:
+            model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
+            tree_params = model.get_params()
+        else:
+            tree_params = self.trees[0].get_params()
+        tree_params = self.trees[0].get_params()
+        tree_params["n_estimators"] = self.n_estimators
+        tree_params["learning_rate"] = self.learning_rate
+        tree_params.pop("max_features")
+        return tree_params
 
     def _RMSE(x, y):
         return  np.sqrt(((x - y)**2).mean())

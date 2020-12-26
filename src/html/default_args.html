@@ -14,18 +14,32 @@
     text-align: center;
    }
   </style>
+<style>
+.bg {
+  /* The image used */
+  background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");
+  /* Full height */
+  height: 100%;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: repeat;
+  background-size: cover;
+}
+</style>
+
+<div class="bg">
 
 <div class="container">
-	<div class="brd"><p><font size="4" color="Black" face="Georgia">
+	<div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
 <font size="5" color="Black" face="Georgia">RandomForestMSE:</font></br> n_estimators=100, feature_sample_size=0.5, max_depth=None, criterion='mse', splitter='best', min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, ccp_alpha=0.0
 </font></p></div>
 </br>
-<div class="brd"><p><font size="4" color="Black" face="Georgia">
-<font size="5" color="Black" face="Georgia">GradientBoostingMSE:</font></br> n_estimators=100, learning_rate=0.1 feature_sample_size=0.5, max_depth=None, criterion='mse', splitter='best', min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, ccp_alpha=0.0</br>
+<div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
+<font size="5" color="Black" face="Georgia">GradientBoostingMSE:</font></br> n_estimators=100, learning_rate=0.1, feature_sample_size=0.5, max_depth=None, criterion='mse', splitter='best', min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, ccp_alpha=0.0</br>
 </font></div>
       {{ wtf.quick_form(form) }}
 </div>
-
+</div>
 
 
 {% endblock %}

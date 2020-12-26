@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
-from scipy.optimize import minimize_scalar
 
 
 class RandomForestMSE:
@@ -81,13 +80,14 @@ class RandomForestMSE:
         return res / self.n_estimators
     
     def get_params(self):
+        tree_params = {}
+        tree_params["n_estimators"] = self.n_estimators
+        tree_params["feature_subsample_size"] = self.fss
         if len(self.trees) == 0:
             model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
-            tree_params = model.get_params()
+            tree_params.update(model.get_params())
         else:
-            tree_params = self.trees[0].get_params()
-        tree_params = self.trees[0].get_params()
-        tree_params["n_estimators"] = self.n_estimators
+            tree_params.update(self.trees[0].get_params())
         tree_params.pop("max_features")
         return tree_params
 
@@ -166,14 +166,15 @@ class GradientBoostingMSE:
         return res * self.learning_rate
 
     def get_params(self):
-        if len(self.trees) == 0:
-            model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
-            tree_params = model.get_params()
-        else:
-            tree_params = self.trees[0].get_params()
-        tree_params = self.trees[0].get_params()
+        tree_params = {}
         tree_params["n_estimators"] = self.n_estimators
         tree_params["learning_rate"] = self.learning_rate
+        tree_params["feature_subsample_size"] = self.fss
+        if len(self.trees) == 0:
+            model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
+            tree_params.update(model.get_params())
+        else:
+            tree_params.update(self.trees[0].get_params())
         tree_params.pop("max_features")
         return tree_params
 

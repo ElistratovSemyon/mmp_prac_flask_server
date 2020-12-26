@@ -14,12 +14,14 @@
   text-align: center;
 }
 </style>
-
 <div class="bg">
 <div class="container">
-  <div class="brd"><p><font size="4" color="Black" face="Georgia">
-    Hello! This is Flask server, whic allow to fit Regressors and predict.
+  <div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
+    {% autoescape false %}
+    {{text}}
+    {% endautoescape %}
   </font></p></div>
+</br>
   {{ wtf.quick_form(form) }}
 </div>
 </div>

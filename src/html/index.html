@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="bg">
 
-<div><center><p><font size="20" color="Black" face="Georgia">Create new model.</font></center></div>
-<div class="container">
-      {{ wtf.quick_form(form) }}
+<div class="container" center>
+	<div><center><p><font size="20" color="Black" face="Georgia">Create new model.</font></p></center></div>
+  {{ wtf.quick_form(form) }}
 </div>
-
-
-
+</br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+  {% for category, message in messages %}
+  <div class="{{category}}">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ message }}
+  </div>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+</div>
 {% endblock %}

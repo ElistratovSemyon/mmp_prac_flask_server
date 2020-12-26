@@ -3,23 +3,26 @@
 {% block content %}
 
 <style>
-   .brd {
-    background-color: white;
-    font-family: 'PT Sans', sans-serif;
-    font-size: 20px;
-    color: blue;
-    padding: 25px 25px 25px 25px;
-    outline-style: solid;
-    outline-color: navy;
-    outline-offset: -10px;
-    text-align: center;
-   }
+ .brd {
+  background-color: white;
+  font-family: 'PT Sans', sans-serif;
+  font-size: 20px;
+  color: blue;
+  padding: 25px 25px 25px 25px;
+  outline-style: solid;
+  outline-color: navy;
+  outline-offset: -10px;
+  text-align: center;
+}
 </style>
- 
-    <div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
-      {% autoescape false %}
-          {{text}}
-      {% endautoescape %}
-    </font></p></div>
-
+<div class="bg">
+  <div class="container">
+  <div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
+    {% autoescape false %}
+    {{text}}
+    {% endautoescape %}
+  </font></p></div>
+  {{ wtf.quick_form(form) }}
+</div>
+</div>
 {% endblock %}

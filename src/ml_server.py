@@ -139,7 +139,7 @@ def fit(filename, name, model_type, kwargs, default_file=True):
         val.to_csv("Losses_on_iteration.csv")
     info = info.replace('\n', '<br>')
 
-    model_file_name = model_path + name + ".pkl"
+    model_file_name = name + ".pkl"
     pickle.dump(model, open(model_file_name, "wb"))
 
     return model_file_name, info, model_type
@@ -211,6 +211,10 @@ def new_model():
             else:
                 filename = save_fit_file(request.files[ml_form.file.name])
                 try:
+                    folder = os.listdir("./")
+                    for item in folder:
+                        if item.endswith(".pkl"):
+                            os.remove(os.path.join("./", item))
                     model, info, model_type = fit(
                         filename, ml_form.name.data, ml_form.model.data,
                         ml_form.kwargs.data, default_file=False)
@@ -228,11 +232,13 @@ def get_predict():
     out = OutputForm()
     model_info = request.args.get("model_info")
     model_name = request.args.get("model_name")
+    print("\n\n\npreict\n")
+    print(model_name)
     model_type = request.args.get("model_type")
     if ml_form.validate_on_submit():
         if ml_form.info.data:
-            return redirect(url_for('model_info', info=model_info,
-                                    model=model_name, model_type=model_type))
+            return redirect(url_for('model_info', model_info=model_info,
+                                    model_name=model_name, model_type=model_type))
         if ml_form.submit.data:
             if ml_form.file.data.filename == '':
                 flash("Please upload file", "alert alert-warning")
@@ -269,7 +275,6 @@ def default_args():
 @app.route('/model_info', methods=['GET', 'POST'])
 def model_info():
     form = InfoForm()
-    info = request.args.get("info")
     model_info = request.args.get("model_info")
     model_name = request.args.get("model_name")
     model_type = request.args.get("model_type")
@@ -281,6 +286,6 @@ def model_info():
             if model_type == "GradientBoosting":
                 return (send_file("Losses_on_iteration.csv", as_attachment=True))
     if model_type == "RandomForest":
-        return render_template('model_info.html', text=info, form=form)
+        return render_template('model_info.html', text=model_info, form=form)
     else:
-        return render_template('model_info_with_verbose.html', text=info, form=form)
+        return render_template('model_info_with_verbose.html', text=model_info, form=form)

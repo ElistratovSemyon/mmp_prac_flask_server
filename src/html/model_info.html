@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <style>
    .brd {
     background-color: white;
@@ -15,16 +16,10 @@
    }
 </style>
  
-<div class="container">
-    <div class="brd"><p><font size="4" color="Black" face="Georgia">
-      {{ text }}
+    <div class="alert alert-info"><p><font size="4" color="Black" face="Georgia">
+      {% autoescape false %}
+          {{text}}
+      {% endautoescape %}
     </font></p></div>
-</div>
-
-<div class="container">
-     {{ wtf.quick_form(form) }}
-</div>
-
-
 
 {% endblock %}

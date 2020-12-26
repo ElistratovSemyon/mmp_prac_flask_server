@@ -14,9 +14,6 @@ import pickle
 import pandas as pd
 import numpy as np
 import re
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
 
 
 add_args = "Model parameters. Input format: arg1=val1, arg2=val2 ..."

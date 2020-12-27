@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
+from scipy.optimize import minimize_scalar
 
 
 class RandomForestMSE:
@@ -137,7 +138,8 @@ class GradientBoostingMSE:
             model = DecisionTreeRegressor(max_depth=self.max_depth, **self.kwargs)
             model.fit(X[:, cols], grad)
             res = model.predict(X[:, cols])
-            g[i] = (grad * res).sum() / (res ** 2).sum() 
+            #g[i] = (grad * res).sum() / (res ** 2).sum() 
+            g[i] = -minimize_scalar(lambda x: ((f - x * res - y)**2).mean()).x
             f += self.learning_rate * g[i] * res
             self.trees.append(model)
             self.tree_features.append(cols)

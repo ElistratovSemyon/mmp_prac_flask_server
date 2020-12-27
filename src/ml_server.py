@@ -27,7 +27,7 @@ model_path = './models/'
 Bootstrap(app)
 messages = []
 
-args_types = {"n_estimators": int, "learning_rate": float, "feature_sample_size": float,
+args_types = {"n_estimators": int, "learning_rate": float, "feature_subsample_size": float,
               "max_depth": int, "criterion": str, "splitter": str, "min_samples_split": int,
               "min_samples_leaf": int, "min_weight_fraction_leaf": float, "random_state": int,
               "max_leaf_nodes": int, "min_impurity_decrease": float, "min_impurity_split": float,

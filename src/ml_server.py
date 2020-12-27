@@ -66,7 +66,7 @@ class BackForm(FlaskForm):
 class InfoForm(FlaskForm):
     #info = TextAreaField("Info about model")
     submit = SubmitField("Back", validators=None)
-    load = SubmitField("Load verbose (for GBD)", validators=None)
+    load = SubmitField("Load train loss", validators=None)
 
 
 class PredictModelForm(FlaskForm):

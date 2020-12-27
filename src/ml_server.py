@@ -285,8 +285,4 @@ def model_info():
                                      model_type=model_type)))
         else:
             return (send_file("Losses_on_iteration.csv", as_attachment=True))
-    if model_type == "RandomForest":
-        return render_template('model_info.html', text=model_info, form=form)
-    else:
-        return render_template('model_info_with_verbose.html', text=model_info,
-                               form=form)
+    return render_template('model_info.html', text=model_info, form=form)

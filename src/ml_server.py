@@ -50,7 +50,8 @@ class OutputForm(FlaskForm):
 
 class NewModelForm(FlaskForm):
     model = SelectField('Model', choices=[
-                        (1, "RandomForest"), (2, "GradientBoosting")], validators=[InputRequired()])
+                        (1, "RandomForest"), (2, "GradientBoosting")],
+                        validators=[InputRequired()])
     name = StringField('Please name your model', validators=[DataRequired()])
     kwargs = TextAreaField(add_args, validators=None)
     file = FileField("Upload train file")
@@ -125,23 +126,20 @@ def fit(filename, name, model_type, kwargs, default_file=True):
         args = {}
     if model_type == "1":
         model = RandomForestMSE(**args)
-        model.fit(X, y)
     else:
         model = GradientBoostingMSE(**args)
-        val = model.fit(X, y, X_val=X, y_val=y)
+    val = model.fit(X, y, X_val=X, y_val=y)
     model_type = "RandomForest" if model_type == "1" else "GradientBoosting"
-
     info = "Model info:\nmodel: '%s', name: '%s', parameters: %s \n" % (
         model_type, name, str(model.get_params()))
-    info += "Dataset info:\n name: '%s', shape: (%d, %d); mean target: %.4f \n" % (filename, *data.shape, y.mean())
-    if model_type == "GradientBoosting":
-        val = pd.DataFrame(val, columns=["RMSE"])
-        val.to_csv("Losses_on_iteration.csv")
+    info += "Dataset info:\n name: '%s', shape: (%d, %d); mean target: %.4f \n" % (filename,
+                                                                                   *data.shape,
+                                                                                   y.mean())
+    val = pd.DataFrame(val, columns=["RMSE"])
+    val.to_csv("Losses_on_iteration.csv")
     info = info.replace('\n', '<br>')
-
     model_file_name = name + ".pkl"
     pickle.dump(model, open(model_file_name, "wb"))
-
     return model_file_name, info, model_type
 
 
@@ -254,13 +252,15 @@ def get_predict():
             if ml_form.file.data.filename == '':
                 flash("Please upload file", "alert alert-warning")
                 return redirect(url_for('get_predict', model_name=model_name,
-                                        model_info=model_info, model_type=model_type))
+                                        model_info=model_info,
+                                        model_type=model_type))
             else:
                 score = validation(
                     request.files[ml_form.file.name], model_name, out.val_score)
                 flash("RMSE: %.4f" % score, "alert alert-success")
                 return redirect(url_for('get_predict', model_name=model_name,
-                                        model_info=model_info, model_type=model_type))
+                                        model_info=model_info,
+                                        model_type=model_type))
     return render_template('from_form.html', form=ml_form)
 
 
@@ -281,11 +281,12 @@ def model_info():
     if form.validate_on_submit():
         if form.submit.data:
             return (redirect(url_for('get_predict', model_name=model_name,
-                                     model_info=model_info, model_type=model_type)))
+                                     model_info=model_info,
+                                     model_type=model_type)))
         else:
-            if model_type == "GradientBoosting":
-                return (send_file("Losses_on_iteration.csv", as_attachment=True))
+            return (send_file("Losses_on_iteration.csv", as_attachment=True))
     if model_type == "RandomForest":
         return render_template('model_info.html', text=model_info, form=form)
     else:
-        return render_template('model_info_with_verbose.html', text=model_info, form=form)
+        return render_template('model_info_with_verbose.html', text=model_info,
+                               form=form)

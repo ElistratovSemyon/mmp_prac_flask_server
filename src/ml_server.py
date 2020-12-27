@@ -86,14 +86,17 @@ def kwargs_handler(kwargs):
         if tmp[0] not in args_types.keys():
             raise TypeError("Incorrect argument: %s" % tmp[0])
         if args_types[tmp[0]] != str:
-            try:
-                tmp[1] = float(tmp[1])
-            except:
-                raise ValueError("Incorrect type of argument: %s" % tmp[0])
-            if int(tmp[1]) == float(tmp[1]):
-                kwargs_dict[tmp[0]] = int(tmp[1])
+            if tmp[1] == "None":
+                kwargs_dict[tmp[0]] = None
             else:
-                kwargs_dict[tmp[0]] = int(tmp[1])
+                try:
+                    tmp[1] = float(tmp[1])
+                except:
+                    raise ValueError("Incorrect type of argument: %s" % tmp[0])
+                if int(tmp[1]) == float(tmp[1]):
+                    kwargs_dict[tmp[0]] = int(tmp[1])
+                else:
+                    kwargs_dict[tmp[0]] = float(tmp[1])
         else:
             kwargs_dict[tmp[0]] = tmp[1]
     return kwargs_dict
